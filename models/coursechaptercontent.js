@@ -1,44 +1,30 @@
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
-  const CourseChapterContent = sequelize.define('courseChapterContent', {
+  const CourseChapterContent = sequelize.define('CourseChapterContent', {
     courseChapterId: {
       type: DataTypes.INTEGER,
-      allowNull: false
     },
     contentTypeId: {
       type: DataTypes.INTEGER,
     },
     isMandatory: {
       type: DataTypes.BOOLEAN,
-      allowNull: false
     },
     timeRequiredInSeconds: {
       type: DataTypes.INTEGER,
-      allowNull: false
     },
     isOpenForFree: {
       type: DataTypes.BOOLEAN,
-      allowNull: false
     },
-  }, {
-    paranoid: true
   });
 
   CourseChapterContent.associate = (models) => {
     CourseChapterContent.belongsTo(models.CourseChapter, {
-      foreignKey: {
-        name: 'courseChapterId',
-        allowNull: false
-      },
-      as: 'courseChapterContent'
+      foreignKey: 'courseChapterId',
     });
-    CourseChapterContent.hasMany(models.CourseChapter, {
-      foreignKey: {
-        name: 'courseChapterContentId',
-        allowNull: false
-      },
-      as: 'learnProgress'
+    CourseChapterContent.hasMany(models.LearnProgress, {
+      foreignKey: 'courseChapterContentId',
     });
   };
 

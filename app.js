@@ -5,7 +5,7 @@ var cookieParser = require('cookie-parser');
 const cors = require('cors');
 var logger = require('morgan');
 require("dotenv").config();
-const routes = require('./User/routes/index')
+const routes = require('./Routes')
 
 const {
   SESSION_SECRET

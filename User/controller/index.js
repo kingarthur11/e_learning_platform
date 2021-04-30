@@ -1,6 +1,6 @@
 const {loginValidate, signupValidate, resetPasswordValidate} = require('./check')
 const byCrypT = require('bcrypt')
-const {User} = require("../../models");
+const {User, Enrollment} = require("../../models");
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer')
 const crypto = require('crypto');
@@ -63,7 +63,11 @@ exports.login = async (req, res) => {
 
 exports.findAll = async (req, res) => {
      try {
-         const user = await User.findAll({});
+         const user = await User.findAll({
+            include: [{
+                model: Enrollment,
+              }]
+         });
          res.send({users: user})
      } catch(error) {
          res.status(500).send({
@@ -71,6 +75,21 @@ exports.findAll = async (req, res) => {
          })
      }
  };
+
+ exports.findAll = async (req, res) => {
+    const {id} = req.params;
+    
+    try {
+        let data = await Categories.findByPk(id, {
+            include: [{
+                model: Enrollment
+              }]
+        });
+        return res.status(200).json(data);      
+    } catch (error) {
+        return res.status(500).send({message: "error retrieving"})
+    }
+};
 
 exports.forgotPassword = async (req, res) => {
     try {
@@ -140,3 +159,47 @@ exports.resetPassword = async (req, res) => {
         res.status(500).json({message: 'something went wrong'})
     } 
 } 
+
+exports.update = async (req, res) => { 
+    const {firstName, lastName, email, } = req.body;
+    try {
+        if(!req.body){
+            return res.status(400).send({message: 'Data to update cannot be empty'})
+        }
+        const {id} = req.params;
+        const data = await User.update({
+            lastName,
+            firstName,
+            email,
+            }, {where: { id: id }});
+            return res.send({user: data})
+    } catch (error) {
+        return res.status(500).send({message: "error retrieving for update"})
+    }
+}
+
+exports.delete = async (req, res) => {
+    const {id} = req.params;
+    try {
+        await User.destroy({where: { id: id }})
+        return res.status(200).send({message: "ok"})
+    } catch (error) {
+        return res.status(500).send({message: "error retrieving"})
+    }
+}
+
+exports.deleteAll = async (req, res) => {
+    try {
+        await User.destroy({
+            where: {},
+            truncate: false
+          })
+        return res.status(200).send({message: "ok"})
+    } catch (error) {
+        return res.status(500)
+            .send({message: "error retrieving"})
+    }
+}
+
+
+  

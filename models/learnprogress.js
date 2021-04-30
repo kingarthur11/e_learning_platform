@@ -1,45 +1,30 @@
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
-  const LearnProgress = sequelize.define('learnProgress', {
+  const LearnProgress = sequelize.define('LearnProgress', {
     enrollmentId: {
       type: DataTypes.INTEGER,
-      allowNull: false
     },
     courseChapterContentId: {
       type: DataTypes.INTEGER,
-      allowNull: false
     },
     beginTimeStamp: {
       type: DataTypes.DATE,
-      allowNull: false
     },
     completionTimeStamp: {
       type: DataTypes.DATE,
-      allowNull: false
     },
     status: {
       type: DataTypes.BOOLEAN,
-      allowNull: false
     },
-  }, {
-    paranoid: true
   });
 
   LearnProgress.associate = (models) => {
     LearnProgress.belongsTo(models.Enrollment, {
-      foreignKey: {
-        name: 'enrollmentId',
-        allowNull: false
-      },
-      as: 'learnProgress'
+      foreignKey: 'enrollmentId',
     });
     LearnProgress.belongsTo(models.Course, {
-      foreignKey: {
-        name: 'courseChapterContentId',
-        allowNull: false
-      },
-      as: 'learnProgress'
+      foreignKey: 'courseChapterContentId',
     });
   };
 
