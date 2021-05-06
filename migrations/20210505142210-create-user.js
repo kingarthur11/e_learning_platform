@@ -8,10 +8,10 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      firstName: {
+      firstname: {
         type: Sequelize.STRING
       },
-      lastName: {
+      lastname: {
         type: Sequelize.STRING
       },
       email: {
@@ -21,6 +21,12 @@ module.exports = {
         type: Sequelize.STRING
       },
       confirm_password: {
+        type: Sequelize.STRING
+      },
+      resetpasswordexpires: {
+        type: Sequelize.DATE
+      },
+      resetPassword: {
         type: Sequelize.STRING
       },
       createdAt: {

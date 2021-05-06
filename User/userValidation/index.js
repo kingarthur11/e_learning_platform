@@ -1,12 +1,12 @@
 const Joi = require('joi');
 
 const signupValidate = Joi.object({
-    firstName: Joi.string()
+    firstname: Joi.string()
         .alphanum()
         .min(3)
         .max(30)
         .required(),
-    lastName: Joi.string()
+    lastname: Joi.string()
         .alphanum()
         .min(3)
         .max(30)
@@ -31,6 +31,9 @@ const resetPasswordValidate = Joi.object({
             tlds: { allow: ['com', 'net'] } }), 
     })
     
-module.exports.signupValidate = signupValidate;
-module.exports.loginValidate = loginValidate;
-module.exports.resetPasswordValidate = resetPasswordValidate;
+module.exports = 
+{
+    signupValidate, 
+    loginValidate, 
+    resetPasswordValidate 
+};

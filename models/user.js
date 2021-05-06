@@ -2,19 +2,33 @@
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
-    firstName: DataTypes.STRING,
-    lastName: DataTypes.STRING,
-    email: DataTypes.STRING,
-    password: DataTypes.STRING,
-    confirm_password: DataTypes.STRING,
-    resetPassword: DataTypes.STRING,
-    resetPasswordExpires: DataTypes.DATE
+    firstname: {
+      type: DataTypes.STRING,
+    },
+    lastname: {
+      type: DataTypes.STRING,
+    },
+    email: {
+      type: DataTypes.STRING,
+    },
+    password: {
+      type: DataTypes.STRING,
+    },
+    confirm_password: {
+      type: DataTypes.STRING,
+    },
+    resetpasswordexpires: {
+      type: DataTypes.DATE,
+    },
+    resetPassword: {
+      type: DataTypes.STRING,
+    },
   });
 
   User.associate = (models) => {
     User.hasMany(models.Enrollment, {
-      foreignKey: 'userId',
-    });  
+      foreignKey:  'userId',
+    });
   };
 
   return User;

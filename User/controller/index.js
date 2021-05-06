@@ -1,14 +1,15 @@
-const {loginValidate, signupValidate, resetPasswordValidate} = require('./check')
+const {loginValidate, signupValidate, resetPasswordValidate} = require('../userValidation')
+const generateUserToken = require('../../middleware/userAuth')
 const byCrypT = require('bcrypt')
-const {User, Enrollment} = require("../../models");
 const jwt = require('jsonwebtoken');
+const {User} = require("../../models");
 const nodemailer = require('nodemailer')
 const crypto = require('crypto');
 const {google} = require('googleapis');
 require("dotenv").config();
+const {getAllProperties, getProperty, signUpUser} = require('../model')
 
 const {
-    TOKEN_SECRET,
     MAIL_USERNAME,
     MAIL_PASSWORD,
     OAUTH_CLIENTID,
@@ -18,29 +19,16 @@ const {
 } = process.env;
 
 exports.signup = async (req, res) => {
+    const { firstname, lastname, email, password, confirm_password } = req.body;
     try {
-        const {firstName, lastName, password, confirm_password, email, } = req.body;
-        const {error} = signupValidate.validate(req.body, {allowUnknown: true})
-        if (error) return res.status(400).send(error.details[0].message);  
-        const emailExists = await User.findOne({where: {email}});
-        if(password !== confirm_password) return res.status(400).json({message: 'password does not match'})
-        if(emailExists) return res.status(400).send("A User account with this email already exists"); 
-        const salt = await byCrypT.genSalt(10);
-        const hashPwd = await byCrypT.hash(password, salt)
-        const user = await User.create({
-            lastName,
-            firstName,
-            email,
-            password: hashPwd,
-            confirm_password });
-        const token = jwt.sign({id: user.id, email: user.email, 
-            exp: Math.floor(Date.now() / 1000) + (60 * 10)}, 
-            process.env.TOKEN_SECRET); 
-        return res.status(200).json({ status: "Success", user, token });
+    const {error} = signupValidate.validate(req.body, {allowUnknown: true})
+    if (error) return res.status(400).send(error.details[0].message);  
+    const data = await signUpUser({ firstname, lastname, email, password, confirm_password })
+    const token = generateUserToken({email: data.email, id: data.id});
+        return res.status(200).json({ status: "Success", data, token});
     } catch (error) {
         res.status(500).json({message: 'something went wrong'})
     }
-    
 };
 
 exports.login = async (req, res) => {
@@ -52,9 +40,7 @@ exports.login = async (req, res) => {
         if(!user) return res.status(400).send("Email is not correct");
         const validPassword = await byCrypT.compare(password, user.password);
         if(!validPassword) return res.status(400).send("Invalid password");
-        const token = jwt.sign({id: user.id, email: user.email, 
-            exp: Math.floor(Date.now() / 1000) + (60 * 10)}, 
-            TOKEN_SECRET); 
+        const token = generateUserToken({id: user.id, email: user.email}); 
         return res.status(200).json({ status: "Success", user, token });
     } catch (error) {
         res.status(500).json({message: 'something went wrong'})
@@ -63,11 +49,7 @@ exports.login = async (req, res) => {
 
 exports.findAll = async (req, res) => {
      try {
-         const user = await User.findAll({
-            include: [{
-                model: Enrollment,
-              }]
-         });
+         const user = await getAllProperties()
          res.send({users: user})
      } catch(error) {
          res.status(500).send({
@@ -76,15 +58,10 @@ exports.findAll = async (req, res) => {
      }
  };
 
- exports.findAll = async (req, res) => {
+ exports.findOne = async (req, res) => {
     const {id} = req.params;
-    
     try {
-        let data = await Categories.findByPk(id, {
-            include: [{
-                model: Enrollment
-              }]
-        });
+        let data = await getProperty(id)
         return res.status(200).json(data);      
     } catch (error) {
         return res.status(500).send({message: "error retrieving"})
@@ -202,4 +179,3 @@ exports.deleteAll = async (req, res) => {
 }
 
 
-  
